@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real time crypto Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .crypto-card {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .crypto-card h2 {
+            grid-column: span 2;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .crypto-card p {
+            font-size: 14px;
+        }
+        .crypto-card p span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Crypto Price Tracker</h1>
+    <div id="crypto-container"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on("crypto", (data) => {
+            const cryptoContainer = document.getElementById("crypto-container");
+            cryptoContainer.innerHTML = ""; // Clear previous content
+
+            data.forEach((crypto) => {
+                const cryptoCard = document.createElement("div");
+                cryptoCard.className = "crypto-card";
+
+                const nameElement = document.createElement("h2");
+                nameElement.textContent = crypto.name;
+                cryptoCard.appendChild(nameElement);
+
+                const symbolElement = document.createElement("p");
+                symbolElement.innerHTML = `<span>Symbol:</span> ${crypto.symbol}`;
+                cryptoCard.appendChild(symbolElement);
+
+                const priceElement = document.createElement("p");
+                priceElement.innerHTML = `<span>Price:</span> $${parseInt(crypto.priceUsd).toFixed(2)}`;
+                cryptoCard.appendChild(priceElement);
+
+                const marketCapElement = document.createElement("p");
+                marketCapElement.innerHTML = `<span>Market Cap:</span> $${parseInt(crypto.marketCapUsd).toFixed(2)}`;
+                cryptoCard.appendChild(marketCapElement);
+
+                cryptoContainer.appendChild(cryptoCard);
+            });
+        });
+
+        socket.emit("requestPrices"); // Request prices on page load
+    </script>
+</body>
+</html>
